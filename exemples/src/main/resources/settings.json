@@ -1,0 +1,38 @@
+{
+   "analysis":{
+      "char_filter":{
+         "&_vers_et":{
+            "type":"mapping",
+            "mappings":[
+               "&=> et "
+            ]
+         }
+      },
+      "tokenizer":{
+
+      },
+      "filter":{
+         "mes_stopwords":{
+            "type":"stop",
+            "stopwords":[
+               "foo",
+               "bar"
+            ]
+         }
+      },
+      "analyzer":{
+         "mon_analyzer":{
+            "type":"custom",
+            "char_filter":[
+               "html_strip",
+               "&_vers_et"
+            ],
+            "tokenizer":"standard",
+            "filter":[
+               "lowercase",
+               "mes_stopwords"
+            ]
+         }
+      }
+   }
+}

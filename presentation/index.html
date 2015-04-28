@@ -1,0 +1,1262 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>13@14 : Elasticsearch </title>
+
+		<meta name="description" content="Présentation générale d'Elasticsearch ">
+		<meta name="author" content="Maël Gargadennec">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/beige.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+		
+		<style>
+			.reveal section img { background:none; border:none; box-shadow:none; }
+		</style>
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Elasticsearch</h1>
+					<h2>13@14</h2>
+					<p>
+						<small>par <a href="mailto:mgargadennec@cardiweb.com">Maël Gargadennec</a></small>
+					</p>
+				</section>
+
+                <section>
+                    <h2>Sommaire</h2>
+                    <div>
+					<ul>
+						<li>Présentation</li>
+						<li>Mise en place</li>
+						<li>L'indexation</li>
+						<li>La recherche</li>
+                    </ul>
+                    </div>
+				</section>
+
+				<section>
+					<section>
+						<h2>Ce que c'est</h2>
+					</section>
+					
+					<section>	
+						<h3>Présentation générale</h3>
+						<p>Moteur de recherche Open-source</p>
+						<p>Créé en 2009 par Shay Banon</p>
+						<p>
+							Géré par la société <img src="img/logo-elastic.png" style="border:0;vertical-align:bottom;" > depuis 2012 (précédemment Elasticsearch)								
+						</p>						
+					</section>
+					
+					<section>					
+						<h3>Caractéristiques principales</h3>
+						<p>Distribué, scalable, résilient</p>
+						<p>RESTful API over HTTP</p>
+						<p>
+							Basé sur Apache Lucène
+							<img src="img/lucene.png"/>
+						</p>
+						<p>Simple à mettre en place</p>
+						<p>(Quasi) temps réel</p>
+					</section>
+					
+					<section>					
+						<h3>Cas d'usages</h3>
+						<p style="color:green">Recherche full-text*</p> 
+						<p>Analyses de logs</p>
+						<p>Analyses (tout court)</p>
+						<p>Data discovery</p>
+						<br>
+						<p   style="color:green">* Ce que l'on va voir aujourd'hui</p>
+					</section>
+					
+					<section>					
+						<h3>Dans votre application</h3>
+						<p>
+							<img src="img/webapp.png"/>
+						</p>
+						<p>
+							<img src="img/database.png"/>
+							<img class="fragment fade-in" src="img/elasticsearch.png"/>
+						</p>
+					</section>
+					
+					
+				</section>
+				
+				<section>
+					<section>
+						<h2>Ce que ce n'est pas</h2>
+					</section>
+					
+                    <section data-background="img/magic.gif" style="color:white!important">
+                        <div class="fragment" style="background-color:black!important;color:white!important;">
+                            <h3 style="color:white!important">Un outil magique</h3>
+                            <p>C'est un <b>moteur</b> !</p>
+                        </div>
+					</section>
+					
+					<section data-background="img/delivery.gif" style="color:white!important">
+                        <div class="fragment" style="background-color:black!important;color:white!important;">
+                            <h3 style="color:white!important">Un ETL <small>(Extract / Transform / Load)</small></h3>
+                            <p>Vos données --> à vous de les récupérer et mettre en forme proprement !</p>
+                        </div>
+					</section>
+					
+                    <section data-background="img/specialisation.gif" style="color:white!important">
+                        <div class="fragment" style="background-color:black!important;color:white!important;">
+                            <h3 style="color:white!important">Un produit spécialisé pour votre use case</h3>
+                            <p>Vos besoins + les possibilités du moteur = votre moteur de recherche !</p>
+                        </div>
+					</section>
+					
+                    <section data-background="img/simple.gif" style="color:white!important">
+                        <div class="fragment" style="background-color:black!important;color:white!important;">
+                            <h3 style="color:white!important">Un produit simple pour les besoins complexes</h3>
+                        </div>
+					</section>
+				</section>
+
+				
+				<section>
+					<section>
+						<h2>Vue d'ensemble</h2>
+					</section>
+					
+					<section>	
+						<h3>Big Picture</h3>
+						<img src="img/big-picture.png"/>
+					</section>
+					
+					<section>
+						<h3>Cluster</h3>
+						<blockquote>Un ensemble de noeuds connectés.</blockquote>
+						<blockquote>Un espace de stockage distribué.</blockquote>
+						<blockquote>De la puissance de calcul distribuée.</blockquote>
+						<blockquote>Une sécurité en cas de panne.</blockquote>
+					</section>
+					
+					<section>
+						<h3>Cluster</h3>
+						<img src="img/big-picture-cluster.png"/>
+					</section>
+					
+					<section>
+						<h3>Node</h3>
+						<blockquote>Une instance Elasticsearch appartenant à un cluster donné.</blockquote>
+					</section>
+					
+					<section>
+						<h3>Node</h3>
+						<img src="img/big-picture-node.png"/>
+					</section>
+					
+					<section>
+						<h3>Index</h3>
+						<blockquote>Corpus de document identifié par un nom unique.</blockquote>
+						<blockquote>Les indexs sont dispatchés sur différents noeuds (si vous en avez plusieurs)</blockquote>
+					</section>
+					
+					<section>
+						<h3>Index</h3>
+						<img src="img/big-picture-index.png"/>
+					</section>
+					
+					<section>
+						<h3>Shard</h3>
+						<blockquote>Index (au sens Lucene) qui contient une partie des documents indexés au sein d'un même index (au sens Elasticsearch).</blockquote>
+						<blockquote><b>Primary shard</b> : premier lieu d'indexation du document</blockquote>
+						<blockquote><b>Replica shard</b> : Copie(s) d'un shard. Ceux-ci sont localisés sur un autre node que le primary shard. En cas de panne du shard primary, un des réplicas est promu shard primaire.</blockquote>
+					</section>
+					
+					<section>
+						<h3>Shard</h3>
+						<img src="img/big-picture-shard.png"/>
+					</section>
+								
+					<section>
+						<h3>Alias </h3>
+						<blockquote>
+							Regroupements + filtrages de données indexées sur l'ensemble du cluster.
+						</blockquote>	
+						<blockquote>
+							Utilisable de façon transparente pour le client. (= comme un index)
+						</blockquote>
+						<small>
+							<p><u>Quelques exemples : </u></p>
+							<ul>
+								<li>filtrage sur un type au sein d'un index</li>
+								<li>filtrage sur une valeur de propriété</li>
+								<li>filtrage sur les documents d'un utilisateur</li>
+								<li>regroupements temporels (ex : current_week, last_month, last_seven_days)</li>
+								<li>regroupements de plusieurs index</li>
+							</ul>
+						</small>
+					</section>
+					
+					<section>
+						<h3>Alias</h3>
+						<img src="img/big-picture-alias.png"/>
+					</section>
+										
+					<section>
+						<h3>Fonctionnement d'un cluster</h3>
+						<p>Demo time !</p>
+						<img src="img/demo-time-cluster.gif"/>
+					</section>
+				</section>		
+				
+				<section>
+					<h2>Est-ce adapté à mon besoin ?</h2>
+					<p>Si vous avez un peu de recherche à faire ....</p>
+					<p class="fragment fade-in" style="font-size:5em;">OUI</p>
+				</section>
+				
+				<section>
+					<section>
+						<h2>Mais c'est compliqué à mettre en place, non?</h2>
+					</section>
+					
+					
+					<section>
+						<h3>Vous avez un petit dataset</h3>
+						<h4> (< à quelques centaines de milliers de documents)</h4>						
+						<p>Création d'un node dans votre application</p>
+						<pre><code data-trim="xml"><dependency>
+	<groupId>org.elasticsearch</groupId>
+	<artifactId>elasticsearch</artifactId>
+	<version>1.5.1</version>
+</dependency></code></pre>
+						<pre><code data-trim="java">
+import org.elasticsearch.client.Client;
+import org.elasticsearch.*;
+
+public class BuildMeANodeApplication{
+	public static void main( String[] args ){
+		Node node = NodeBuilder.nodeBuilder().node();
+		Client client = node.client();
+		//do something
+		node.close();
+	}
+}</code></pre>
+					</section>
+										
+					<section>
+						<h3>Vous avez un gros dataset</h3>						
+						<p>Connexion à un cluster existant</p>
+						<pre><code data-trim="shell">
+wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.1.tar.gz
+tar xzvf elasticsearch-1.5.1.tar.gz
+elasticsearch-1.5.1/bin/elasticsearch 
+						</code></pre>
+							<pre><code data-trim="java">
+import org.elasticsearch.client.Client;
+import org.elasticsearch.*;
+
+public class ConnectMeToAClusterApplication{
+  public static void main( String[] args ){
+    Settings settings = ImmutableSettings.settingsBuilder()
+      .put("cluster.name", "myClusterName").build();
+		
+    Client client = new TransportClient(settings)
+	.addTransportAddress(
+	  new InetSocketTransportAddress("localhost", 9300)
+	);
+    //do something
+    client.close();
+  }
+}</code></pre>
+					</section>
+					
+					
+					
+					<section>
+						<h3>Configuration</h3>
+						<pre><code data-trim="yml" contenteditable style="font-size:0.5em;">
+##################### Elasticsearch Configuration Example #####################
+
+# This file contains an overview of various configuration settings,
+# targeted at operations staff. Application developers should
+# consult the guide at <http://elasticsearch.org/guide>.
+#
+# The installation procedure is covered at
+# <http://elasticsearch.org/guide/en/elasticsearch/reference/current/setup.html>.
+#
+# Elasticsearch comes with reasonable defaults for most settings,
+# so you can try it out without bothering with configuration.
+#
+# Most of the time, these defaults are just fine for running a production
+# cluster. If you're fine-tuning your cluster, or wondering about the
+# effect of certain configuration option, please _do ask_ on the
+# mailing list or IRC channel [http://elasticsearch.org/community].
+
+# Any element in the configuration can be replaced with environment variables
+# by placing them in ${...} notation. For example:
+#
+#node.rack: ${RACK_ENV_VAR}
+
+# For information on supported formats and syntax for the config file, see
+# <http://elasticsearch.org/guide/en/elasticsearch/reference/current/setup-configuration.html>
+
+
+################################### Cluster ###################################
+
+# Cluster name identifies your cluster for auto-discovery. If you're running
+# multiple clusters on the same network, make sure you're using unique names.
+#
+#cluster.name: elasticsearch
+
+
+#################################### Node #####################################
+
+# Node names are generated dynamically on startup, so you're relieved
+# from configuring them manually. You can tie this node to a specific name:
+#
+#node.name: "Franz Kafka"
+
+# Every node can be configured to allow or deny being eligible as the master,
+# and to allow or deny to store the data.
+#
+# Allow this node to be eligible as a master node (enabled by default):
+#
+#node.master: true
+#
+# Allow this node to store data (enabled by default):
+#
+#node.data: true
+
+# You can exploit these settings to design advanced cluster topologies.
+#
+# 1. You want this node to never become a master node, only to hold data.
+#    This will be the "workhorse" of your cluster.
+#
+#node.master: false
+#node.data: true
+#
+# 2. You want this node to only serve as a master: to not store any data and
+#    to have free resources. This will be the "coordinator" of your cluster.
+#
+#node.master: true
+#node.data: false
+#
+# 3. You want this node to be neither master nor data node, but
+#    to act as a "search load balancer" (fetching data from nodes,
+#    aggregating results, etc.)
+#
+#node.master: false
+#node.data: false
+
+# Use the Cluster Health API [http://localhost:9200/_cluster/health], the
+# Node Info API [http://localhost:9200/_nodes] or GUI tools
+# such as <http://www.elasticsearch.org/overview/marvel/>,
+# <http://github.com/karmi/elasticsearch-paramedic>,
+# <http://github.com/lukas-vlcek/bigdesk> and
+# <http://mobz.github.com/elasticsearch-head> to inspect the cluster state.
+
+# A node can have generic attributes associated with it, which can later be used
+# for customized shard allocation filtering, or allocation awareness. An attribute
+# is a simple key value pair, similar to node.key: value, here is an example:
+#
+#node.rack: rack314
+
+# By default, multiple nodes are allowed to start from the same installation location
+# to disable it, set the following:
+#node.max_local_storage_nodes: 1
+
+
+#################################### Index ####################################
+
+# You can set a number of options (such as shard/replica options, mapping
+# or analyzer definitions, translog settings, ...) for indices globally,
+# in this file.
+#
+# Note, that it makes more sense to configure index settings specifically for
+# a certain index, either when creating it or by using the index templates API.
+#
+# See <http://elasticsearch.org/guide/en/elasticsearch/reference/current/index-modules.html> and
+# <http://elasticsearch.org/guide/en/elasticsearch/reference/current/indices-create-index.html>
+# for more information.
+
+# Set the number of shards (splits) of an index (5 by default):
+#
+#index.number_of_shards: 5
+
+# Set the number of replicas (additional copies) of an index (1 by default):
+#
+#index.number_of_replicas: 1
+
+# Note, that for development on a local machine, with small indices, it usually
+# makes sense to "disable" the distributed features:
+#
+#index.number_of_shards: 1
+#index.number_of_replicas: 0
+
+# These settings directly affect the performance of index and search operations
+# in your cluster. Assuming you have enough machines to hold shards and
+# replicas, the rule of thumb is:
+#
+# 1. Having more *shards* enhances the _indexing_ performance and allows to
+#    _distribute_ a big index across machines.
+# 2. Having more *replicas* enhances the _search_ performance and improves the
+#    cluster _availability_.
+#
+# The "number_of_shards" is a one-time setting for an index.
+#
+# The "number_of_replicas" can be increased or decreased anytime,
+# by using the Index Update Settings API.
+#
+# Elasticsearch takes care about load balancing, relocating, gathering the
+# results from nodes, etc. Experiment with different settings to fine-tune
+# your setup.
+
+# Use the Index Status API (<http://localhost:9200/A/_status>) to inspect
+# the index status.
+
+
+#################################### Paths ####################################
+
+# Path to directory containing configuration (this file and logging.yml):
+#
+#path.conf: /path/to/conf
+
+# Path to directory where to store index data allocated for this node.
+#
+#path.data: /path/to/data
+#
+# Can optionally include more than one location, causing data to be striped across
+# the locations (a la RAID 0) on a file level, favouring locations with most free
+# space on creation. For example:
+#
+#path.data: /path/to/data1,/path/to/data2
+
+# Path to temporary files:
+#
+#path.work: /path/to/work
+
+# Path to log files:
+#
+#path.logs: /path/to/logs
+
+# Path to where plugins are installed:
+#
+#path.plugins: /path/to/plugins
+
+
+#################################### Plugin ###################################
+
+# If a plugin listed here is not installed for current node, the node will not start.
+#
+#plugin.mandatory: mapper-attachments,lang-groovy
+
+
+################################### Memory ####################################
+
+# Elasticsearch performs poorly when JVM starts swapping: you should ensure that
+# it _never_ swaps.
+#
+# Set this property to true to lock the memory:
+#
+#bootstrap.mlockall: true
+
+# Make sure that the ES_MIN_MEM and ES_MAX_MEM environment variables are set
+# to the same value, and that the machine has enough memory to allocate
+# for Elasticsearch, leaving enough memory for the operating system itself.
+#
+# You should also make sure that the Elasticsearch process is allowed to lock
+# the memory, eg. by using `ulimit -l unlimited`.
+
+
+############################## Network And HTTP ###############################
+
+# Elasticsearch, by default, binds itself to the 0.0.0.0 address, and listens
+# on port [9200-9300] for HTTP traffic and on port [9300-9400] for node-to-node
+# communication. (the range means that if the port is busy, it will automatically
+# try the next port).
+
+# Set the bind address specifically (IPv4 or IPv6):
+#
+#network.bind_host: 192.168.0.1
+
+# Set the address other nodes will use to communicate with this node. If not
+# set, it is automatically derived. It must point to an actual IP address.
+#
+#network.publish_host: 192.168.0.1
+
+# Set both 'bind_host' and 'publish_host':
+#
+#network.host: 192.168.0.1
+
+# Set a custom port for the node to node communication (9300 by default):
+#
+#transport.tcp.port: 9300
+
+# Enable compression for all communication between nodes (disabled by default):
+#
+#transport.tcp.compress: true
+
+# Set a custom port to listen for HTTP traffic:
+#
+#http.port: 9200
+
+# Set a custom allowed content length:
+#
+#http.max_content_length: 100mb
+
+# Disable HTTP completely:
+#
+#http.enabled: false
+
+
+################################### Gateway ###################################
+
+# The gateway allows for persisting the cluster state between full cluster
+# restarts. Every change to the state (such as adding an index) will be stored
+# in the gateway, and when the cluster starts up for the first time,
+# it will read its state from the gateway.
+
+# There are several types of gateway implementations. For more information, see
+# <http://elasticsearch.org/guide/en/elasticsearch/reference/current/modules-gateway.html>.
+
+# The default gateway type is the "local" gateway (recommended):
+#
+#gateway.type: local
+
+# Settings below control how and when to start the initial recovery process on
+# a full cluster restart (to reuse as much local data as possible when using shared
+# gateway).
+
+# Allow recovery process after N nodes in a cluster are up:
+#
+#gateway.recover_after_nodes: 1
+
+# Set the timeout to initiate the recovery process, once the N nodes
+# from previous setting are up (accepts time value):
+#
+#gateway.recover_after_time: 5m
+
+# Set how many nodes are expected in this cluster. Once these N nodes
+# are up (and recover_after_nodes is met), begin recovery process immediately
+# (without waiting for recover_after_time to expire):
+#
+#gateway.expected_nodes: 2
+
+
+############################# Recovery Throttling #############################
+
+# These settings allow to control the process of shards allocation between
+# nodes during initial recovery, replica allocation, rebalancing,
+# or when adding and removing nodes.
+
+# Set the number of concurrent recoveries happening on a node:
+#
+# 1. During the initial recovery
+#
+#cluster.routing.allocation.node_initial_primaries_recoveries: 4
+#
+# 2. During adding/removing nodes, rebalancing, etc
+#
+#cluster.routing.allocation.node_concurrent_recoveries: 2
+
+# Set to throttle throughput when recovering (eg. 100mb, by default 20mb):
+#
+#indices.recovery.max_bytes_per_sec: 20mb
+
+# Set to limit the number of open concurrent streams when
+# recovering a shard from a peer:
+#
+#indices.recovery.concurrent_streams: 5
+
+
+################################## Discovery ##################################
+
+# Discovery infrastructure ensures nodes can be found within a cluster
+# and master node is elected. Multicast discovery is the default.
+
+# Set to ensure a node sees N other master eligible nodes to be considered
+# operational within the cluster. This should be set to a quorum/majority of
+# the master-eligible nodes in the cluster.
+#
+#discovery.zen.minimum_master_nodes: 1
+
+# Set the time to wait for ping responses from other nodes when discovering.
+# Set this option to a higher value on a slow or congested network
+# to minimize discovery failures:
+#
+#discovery.zen.ping.timeout: 3s
+
+# For more information, see
+# <http://elasticsearch.org/guide/en/elasticsearch/reference/current/modules-discovery-zen.html>
+
+# Unicast discovery allows to explicitly control which nodes will be used
+# to discover the cluster. It can be used when multicast is not present,
+# or to restrict the cluster communication-wise.
+#
+# 1. Disable multicast discovery (enabled by default):
+#
+discovery.zen.ping.multicast.enabled: false
+#
+# 2. Configure an initial list of master nodes in the cluster
+#    to perform discovery when new nodes (master or data) are started:
+#
+discovery.zen.ping.unicast.hosts: ["host1", "host2:port"]
+
+# EC2 discovery allows to use AWS EC2 API in order to perform discovery.
+#
+# You have to install the cloud-aws plugin for enabling the EC2 discovery.
+#
+# For more information, see
+# <http://elasticsearch.org/guide/en/elasticsearch/reference/current/modules-discovery-ec2.html>
+#
+# See <http://elasticsearch.org/tutorials/elasticsearch-on-ec2/>
+# for a step-by-step tutorial.
+
+# GCE discovery allows to use Google Compute Engine API in order to perform discovery.
+#
+# You have to install the cloud-gce plugin for enabling the GCE discovery.
+#
+# For more information, see <https://github.com/elasticsearch/elasticsearch-cloud-gce>.
+
+# Azure discovery allows to use Azure API in order to perform discovery.
+#
+# You have to install the cloud-azure plugin for enabling the Azure discovery.
+#
+# For more information, see <https://github.com/elasticsearch/elasticsearch-cloud-azure>.
+
+################################## Slow Log ##################################
+
+# Shard level query and fetch threshold logging.
+
+#index.search.slowlog.threshold.query.warn: 10s
+#index.search.slowlog.threshold.query.info: 5s
+#index.search.slowlog.threshold.query.debug: 2s
+#index.search.slowlog.threshold.query.trace: 500ms
+
+#index.search.slowlog.threshold.fetch.warn: 1s
+#index.search.slowlog.threshold.fetch.info: 800ms
+#index.search.slowlog.threshold.fetch.debug: 500ms
+#index.search.slowlog.threshold.fetch.trace: 200ms
+
+#index.indexing.slowlog.threshold.index.warn: 10s
+#index.indexing.slowlog.threshold.index.info: 5s
+#index.indexing.slowlog.threshold.index.debug: 2s
+#index.indexing.slowlog.threshold.index.trace: 500ms
+
+################################## GC Logging ################################
+
+monitor.jvm.gc.young.warn: 1000ms
+monitor.jvm.gc.young.info: 700ms
+monitor.jvm.gc.young.debug: 400ms
+
+monitor.jvm.gc.old.warn: 10s
+monitor.jvm.gc.old.info: 5s
+monitor.jvm.gc.old.debug: 2s
+
+################################## Security ################################
+
+# Uncomment if you want to enable JSONP as a valid return transport on the
+# http server. With this enabled, it may pose a security risk, so disabling
+# it unless you need it is recommended (it is disabled by default).
+#
+http.jsonp.enable: true</code></pre>
+					</section>
+					
+					<section>
+						<h3>Utilisation du Client Java</h3>
+						<p>Builders !</p>
+						<img src="img/builders.jpg"/>
+						<p>Builders everywhere!</p>
+					</section>
+					
+					<section>
+						<h3>Utilisation du Client Java</h3>
+						<small>
+							<p><b>IndexRequestBuilder</b><br/>client.prepareIndex(String index, String type)</p>
+							<p><b>GetRequestBuilder</b><br/>client.prepareGet(String index, String type, String id)</p>
+							<p><b>UpdateRequestBuilder</b><br/>client.prepareUpdate(String index, String type, String id)</p>
+							<p><b>DeleteRequestBuilder</b><br/>client.prepareDelete(String index, String type, String id)</p>
+							<hr/>
+							<p><b>SearchRequestBuilder</b><br/>client.prepareSearch(String.. indices)</p>
+							<hr/>
+							<p><b>BulkRequestBuilder</b><br/>client.prepareSearch(String.. indices)</p>
+						</small>
+					</section>
+					
+					<section>
+						<h3>Utilisation du Client Java</h3>
+						<p>Executer une requête préparée</p>
+						<small>
+							<p><b>Synchrone</b><br/>builder.execute().actionGet() </p>
+							<br/>
+							<p><b>Asynchrone</b><br/>builder.execute(listener)</p>
+						</small>
+					</section>
+												
+					<section>
+						<h3>Exemple</h3>
+						<p>Demo time !</p>
+						<img src="img/demo-time3.gif"/>
+					</section>
+				</section>
+
+				<section>	
+				
+					<section>
+						<h2>L'indexation</h2>
+					</section>		
+					
+					<section>
+						<h3>Extraire la donnée</h3>
+						<div>
+							<h4>Utiliser une approche ETL (Extract / Transform / Load) distincte permet :</h4>
+							<small>
+								<ul>
+									<li>de séparer les problématiques opérationnelles du traitement</li>
+									<li>de regrouper la donnée de sources multiples</li>
+									<li>de l'enrichir (métadonnées)</li>
+									<li>de la transformer (modèle à plat)</li>
+									<li>de la charger dans ES unitairement ou par batchs</li>
+								</ul>	
+							</small>								
+						</div>
+					</section>	
+					
+					
+					<section>
+						<h3>Stratégies possibles</h3>
+						<p>
+							Indexation totale régulière
+							<br/>
+							<small><u>Techniques</u> : alias switching</small>
+							<br/>
+							<small><u>Adapté</u> : indexation rapide + temps réel non requis </small>
+						</p>
+						<p>
+							Indexation totale régulière + delta par batch
+							<br/>
+							<small><u>Techniques</u> : alias switching, utilisation de timestamps de dernier passage</small>
+							<br/>
+							<small><u>Adapté</u> : indexation rapide + temps réel requis </small>
+						</p>
+						<p>
+							Indexation totale initiale + delta applicatif							
+							<br/>
+							<small><u>Techniques</u> : alias switching, utilisation de timestamps de dernier passage</small>
+							<br/>
+							<small><u>Adapté</u> : indexation longue + temps réel requis </small>
+							<br/>
+							<small style='color:red;'><b><u>Attention</u></b> : vérifier la synchronisation de l'index régulièrement</small>
+						</p>
+					</section>
+					
+					<section>
+						<h3>Modélisation de vos données</h3>
+						<p>
+							Il faut oublier le modèle relationnel !
+							<br/>
+							<small>Adopter le mode de pensée NoSQL : chaque document doit contenir l'ensemble des informations liées.</small>
+						</p>
+						<p>
+							La redondance est souhaitable
+							<br/>
+							<small>Le stockage est peu cher, la performance est critique !</small>
+						</p>
+						<p>
+							Ne pas hésiter à mettre plus de données que nécessaires !
+							<br/>
+							<small>Elles seront ainsi accessibles pour la recherche, pour l'affichage et pour les besoins futurs.</small>
+						</p>
+					</section>
+					
+					<section>
+						<h3>Indexer les données</h3>
+						<h5>Indexation unitaire</h5>
+						<pre><code data-trim="java">
+//Avec Jackson
+String src = new ObjectMapper().writeValueAsString(object);
+
+client.prepareIndex(indexName, type)
+	.setSource(src).execute().actionGet();
+						</code></pre>
+						<pre><code data-trim="java">
+//Avec une Map
+Map author = new HashMap();
+author.put("id", 1464134354314);
+author.put("firstname", "Isaac");
+author.put("lastname", "Asimov");
+
+Map book = new HashMap();
+book.put("id", 435145734);
+book.put("titre","Fondation");
+book.put("releaseYear",1951);
+book.put("author",author);
+
+client.prepareIndex(indexName, type)
+	.setId(book.get("id"))
+	.setSource(book).execute().actionGet();
+						</code></pre>
+					</section>
+							
+					<section>
+						<h3>Indexer les données</h3>
+						<h5>Indexation bulk</h5>
+						<p>Permet d'effectuer N actions sur le cluster avec une unique requête.</p>
+						<pre><code data-trim="java">
+client.prepareBulk()
+	.add(client.prepareIndex(indexName,type).setSource(obj1))
+	.add(client.prepareIndex(indexName,type).setSource(obj2))
+	.add(client.prepareIndex(indexName,type).setSource(obj3))
+	.add(client.prepareIndex(indexName,type).setSource(obj4))
+	.add(client.prepareIndex(indexName,type).setSource(obj5))
+	.add(client.prepareIndex(indexName,type).setSource(obj6))
+	// etc...
+		.execute().actionGet();
+						</code></pre>
+					</section>
+					
+					<section>
+						<h3>Exemple</h3>
+						<p>Demo time !</p>
+						<img src="img/bulk-insert.gif"/>
+					</section>					
+				</section>
+
+				<section>				
+					<section>
+						<h2>La recherche</h2>
+					</section>
+					
+					<section>
+						<h3>Exemple !</h3>
+						<p>Demo time !</p>
+						<p class="fragment" data-fragment-index="1">FAIL ! Ca ne trouve pas les mots accentués !</p>
+						<img class="fragment" data-fragment-index="1" src="img/demo-time2.gif"/>
+						<p class="fragment" data-fragment-index="1">On m'aurait menti ?</p>
+					</section>
+					
+					<section>
+						<h3>Dictionnaire inversé</h3>	
+						<pre>Document 1<code>The quick brown fox jumped over the lazy dog</code></pre>
+						<pre>Document 2<code>Quick brown foxes leap over lazy dogs in summer</code></pre>
+						<small>
+							<small>						
+							<table>
+								<thead>
+									<tr>
+										<th>Terme</th>
+										<th>Document 1</th>
+										<th>Document 2</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Quick</td>
+										<td style="text-align:center;"></td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>The</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;"></td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>brown</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>dog</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;"></td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>dogs</td>
+										<td style="text-align:center;"></td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>fox</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;"></td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>foxes</td>
+										<td style="text-align:center;"></td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>in</td>
+										<td style="text-align:center;"></td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>jumped</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;"></td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>lazy</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>leap</td>
+										<td style="text-align:center;"></td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>over</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>quick</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;"></td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>summer</td>
+										<td style="text-align:center;"></td>
+										<td style="text-align:center;">X</td>
+									</tr>
+									
+									<tr>
+									</tr>
+									
+									<tr>
+										<td>the</td>
+										<td style="text-align:center;">X</td>
+										<td style="text-align:center;"></td>
+									</tr>
+									
+									<tr>
+									</tr>
+																	
+								</tbody>
+							</table>
+							</small>
+						</small>
+					</section>
+					
+					<section>
+						<h3>Analysers</h3>
+						<p>Préparent les contenus envoyés lors de l'indexation et de la recherche<p>
+						<pre><b>0..N CharFilter</b> : retire ou transforme la source initiale (ex : HTML escape) </pre>		
+						<pre><b>1 Tokenizer</b> : découpe le contenu en tokens (ex : sur les espaces)</pre>		
+						<pre><b>0 à N TokenFilter</b> : modifie un flux de tokens. <br/>Peut <b>retirer</b> (ex : stopwords), <b>modifier</b> (ex: lowercase, elision) voire <b>ajouter</b> (ex : Edge-NGram, synonymes) des tokens.</pre>						
+						<p>Peuvent être configurés sur chaque champ.</p>
+						<p>Quelques uns fournis et configurables <br/>+ création possible </p>
+					</section>
+					
+					<section>
+						<h3>Paramétrage d'un index</h3>
+						<pre>PUT /my_index<code style="font-size:0.7em;" data-trim="json">
+{
+   "analysis":{
+      "char_filter":{
+         "&_vers_et":{
+            "type":"mapping",
+            "mappings":[
+               "&=> et "
+            ]
+         }
+      },
+      "tokenizer":{
+
+      },
+      "filter":{
+         "mes_stopwords":{
+            "type":"stop",
+            "stopwords":[
+               "foo",
+               "bar"
+            ]
+         }
+      },
+      "analyzer":{
+         "mon_analyzer":{
+            "type":"custom",
+            "char_filter":[
+               "html_strip",
+               "&_vers_et"
+            ],
+            "tokenizer":"standard",
+            "filter":[
+               "lowercase",
+               "mes_stopwords"
+            ]
+         }
+      }
+   }
+}
+						</code></pre>
+					</section>
+					
+					<section>
+						<h3>API d'analyse</h3>
+						<div>
+							<select id="analyser">
+							  <option value="standard">Standard</option>
+							  <option value="french">Français</option>
+							  <option value="mon_analyzer">Mon analyser custom</option>
+							</select>
+							
+							<button onclick="testAnalyser()"/>Tester</button>
+						</div>
+						<div>
+							<textarea id="text_to_analyze" type="text" value="" cols="50">Voici un peu de texte à analyser !</textarea>
+						</div>
+						
+						<a id="analyze_url" style="font-size:0.6em;" href="">Lien direct</a>
+						<div id="analyse_result">
+						</div>
+						<script>
+							function testAnalyser(){
+								var text = document.getElementById('text_to_analyze').value;
+								var analyzer = document.getElementById('analyser').value;
+							
+								var xmlhttp = new XMLHttpRequest();
+								var url = "http://localhost:9200/mon_index/_analyze?pretty&analyzer="+analyzer+"&text="+text;
+								document.getElementById('analyze_url').href=url;
+								
+								xmlhttp.onreadystatechange = function() {
+									if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+										var tokens = JSON.parse(xmlhttp.responseText).tokens;
+										var arr = "";
+										for(var i=0;i<tokens.length;i++){
+											arr+=tokens[i].token+" ";
+										}
+										document.getElementById('analyse_result').innerHTML="<pre><code id='analyse_result'>"+arr+"</code></pre>";
+									}else{
+										document.getElementById('analyse_result').innerHTML="Erreur : Noeud ES non lancé ?"
+									}
+								};
+								xmlhttp.open("GET", url, true);
+								xmlhttp.send();
+								
+							}
+							testAnalyser();
+						</script>
+						
+								
+					</section>
+					<section>
+						<h3>Mapping</h3>
+						<pre><code data-trim="json" style="font-size:0.7em;">
+{
+  "mon_type": {
+    "properties": {
+      "id": {
+        "type": "string",
+        //Pas d'analyze : on veut le retrouver via un match exact
+        "index": "not_analyzed"
+      },
+      "titre": {
+        "type": "string",
+        //Analyzer français par défaut
+        "analyzer": "french"
+      },
+      "sousTitre": {
+        "type": "string",
+        //Analyzer custom
+        "analyzer": "mon_analyzer"
+      },
+      "year": {
+        //Pas réellement besoin d'analyse sur un type primitif
+        "type": "integer"
+      },
+      "createdAt": {
+        "type": "date",
+        //ES gère bien les dates tout seul
+        "format": "dateOptionalTime"
+      }
+    }
+  }
+ }
+						</code></pre>
+					</section>
+					
+					<section>
+						<h3>Queries</h3>
+						<p>Permettent d'effectuer une recherche (si si !) textuelle, basée sur les analysers.</p>
+						<p>Les builders permettent de composer différents niveaux de requêtes à l'aide de la BoolQuery.</p>
+						<small>
+							<p>
+								<b>Match Query</b>, <b>Multi Match Query</b>, <b>Bool Query</b>, Boosting Query, Common Terms Query, Constant Score Query, Dis Max Query, <b>Filtered Query</b>, Fuzzy Like This Query, Fuzzy Like This Field Query, <b>Function Score Query</b>, <b>Fuzzy Query</b>, GeoShape Query, Has Child Query, Has Parent Query, Ids Query, Indices Query, <b>Match All Query</b>, More Like This Query, <b>Nested Query</b>, Prefix Query, <b>Query String Query</b>, Simple Query String Query, <b>Range Query</b>, Regexp Query, Span First Query, Span Multi Term Query, Span Near Query, Span Not Query, Span Or Query, Span Term Query, <b>Term Query</b>, <b>Terms Query</b>, Top Children Query, Wildcard Query, Minimum Should Match, Multi Term Query Rewrite, Template Query
+							</p>
+						</small>
+					</section>
+					
+					<section>
+						<h3>Filters</h3>
+						<p>Permettent de filtrer (si, si, j'insiste) les données par des valeurs <b>EXACTES</b>.</p>
+						<p>Les builders permettent de composer différents niveaux et conditions de filtrage (boolFilter, orFilter, andFilter)</p>
+						<p>S'appliquent en amont de la recherche, ainsi que sur les aggrégations.</p>
+						<small>
+							<p>
+								<b>And Filter</b>, 
+<b>Bool Filter</b>, <b>Exists Filter</b>, <b>Geo Bounding Box Filter</b>, <b>Geo Distance Filter</b>, Geo Distance Range Filter, Geo Polygon Filter, GeoShape Filter, Geohash Cell Filter, Has Child Filter, Has Parent Filter, Ids Filter, Indices Filter, Limit Filter, Match All Filter, Missing Filter, <b>Nested Filter</b>, <b>Not Filter</b>, <b>Or Filter</b>,Prefix Filter, Query Filter, <b>Range Filter</b>,Regexp Filter, Script Filter, <b>Term Filter</b>, <b>Terms Filter</b>, <b>Type Filter</b>             
+							</p>
+						</small>
+					</section>
+					
+					<section>
+                        <h3>Aggregations</h3>
+                        <p>Permettent de regrouper des données dans des "buckets".</p>
+                        <p>Peuvent être nested (composés) pour avoir plusieurs niveaux d'aggrégations.</p>
+                        <pre><code data-trim="java">
+AggregationBuilders
+    .terms("byYear")
+    .field("year")
+    .size(25)
+    .subAggregation(
+        AggregationBuilders
+            .terms("byCategory")
+            .field("category")
+            .size(5)
+</code></pre>
+                    </section>
+                    <section>
+                        <h3>Percolation</h3>
+                        <p>Permet de stocker des RECHERCHES et d'être prévenu lorsqu'un document "trouvé" par cette requête est indexée.</p>
+                        <p>Ex : Emailing sur requêtes préférées, comparaison</p>
+                    </section>
+                    <section>
+                        <h3>Plugins</h3>
+                        <p>Rajoute des fonctionnalités (analysers, endpoints, ...)</p>
+                        <p>Rajoute des interfaces (requêtage, monitoring, management, ...)sur l'API.</p>
+                        <pre><code>bin/plugin -i mobz/elasticsearch-head</code></pre>
+                    </section>
+				</section>
+				
+				<section style="text-align: left;">
+					<h1>THE END</h1>
+					<h4>Des questions?</h4>
+					
+					<p>
+						Quelques documents :
+						<ol>
+							<li><a href="https://www.elastic.co/">Site officiel</a></li>
+							<li><a href="http://www.elastic.co/guide/en/elasticsearch/reference/current/index.html">Documentation de référence (API)</a></li>
+							<li><a href="https://www.elastic.co/use-cases">Use cases</a></li>
+							<li><a href="http://www.elastic.co/guide/en/elasticsearch/client/java-api/current/index.html">Documentation JAVA</a></li>
+							<li><a href="https://www.parleys.com/tutorial/elasticsearch-2">Conférence plus complète (par D. Pilato)</a></li>
+							<li><a href="https://www.parleys.com/tutorial/5-ingredients-pour-pimenter-elasticsearch">Problématiques avancées (nested mapping, hiérarchies, ...)</a></li>
+						</ol>
+					</p>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true },
+					{ src: 'plugin/notes/notes.js', async: true }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>

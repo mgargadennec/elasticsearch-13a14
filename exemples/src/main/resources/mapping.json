@@ -1,0 +1,29 @@
+{
+  "mon_type": {
+    "_all":{
+        "analyzer": "french",
+    	"enabled":true
+    },
+    "properties": {
+      "id": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "titre": {
+        "type": "string",
+        "analyzer": "french"
+      },
+      "sousTitre": {
+        "type": "string",
+        "analyzer": "mon_analyzer"
+      },
+      "year": {
+        "type": "integer"
+      },
+      "createdAt": {
+        "type": "date",
+        "format": "dateOptionalTime"
+      }
+    }
+  }
+ }
